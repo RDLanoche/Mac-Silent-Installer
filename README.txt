@@ -44,11 +44,17 @@ run by the Script_runner
     - The second user input is left unchanged
 
 - The DMG_install_fn.sh details the process to istall a DMG file
+    - (idea) once completed, deactivate the installer it just ran
 
 - The pkg_install_fn.sh details the process to install a pkg file
+    - (idea) once completed, deactivate the installer it just ran
 
 - The Cleanup_installer.sh removes the installer folder once the process is complete
     - The script is run only if the User_input enables the cleanup option
+
+- The Script_runner.sh will run all the installers currently active
+    - Run chmod on all sh files in the directory
+    - Execute all active installers.
 
 
 Program Architecture
