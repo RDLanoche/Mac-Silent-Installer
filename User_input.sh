@@ -62,10 +62,11 @@
         #checks is the directory is a valid directory (prevents user from inputting incomplete portion of the directory)
         SecondUserInput ;
         while [[ "$FULLPATH_ORIGINAL" != "$DIRPATH_ORIGINAL"* ]] || [ ! -d "$DIRPATH_ORIGINAL" ] ; do
+            echo ;
             echo [ERROR] The path you specified needs to be a parent to the installer file.
             echo Try again.
             echo  ;
-        SecondUserInput ;
+            SecondUserInput ;
             echo _____________________ ;
         done ;
 
@@ -169,7 +170,11 @@
     #[FUNCTION] - Option to enable the script for the ScriptRunner.sh
         Fn_Enable() {
             echo ;
-            read -p "Do you wish to activate this install procedure? (y/n)" VAR_ENABLE ;
+            echo [INFO] By enabling the installer script, the script runner will run this Script
+            echo        along with all the other enabled script. If the script is disabled, it can still
+            echo        be run manually.
+            echo ;
+            read -p "Do you wish to enable this installer script? (y/n): " VAR_ENABLE ;
         }
     #[PROCEDURE] - Run function & validation rules
         VAR_ENABLE="y" ;
@@ -181,12 +186,16 @@
         done
     #[STATUS] - Provide user with status of current configs
         if [[ "$VAR_ENABLE" == "y" ]] ; then
+            echo ;
             echo Script enabled ;
         elif [[ "$VAR_ENABLE" == "n" ]] ; then
             echo Script disabled ;
+            echo ;
         fi 
+    echo ;
 
 #6. Generate Install Script
 #Extra Comments
     #Strip slashes from the end of the second and third input
     #Input validation for the last two inputs.
+    #Limit file types (validation for header 1)
