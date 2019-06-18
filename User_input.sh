@@ -9,33 +9,54 @@
 
 #1. Input Installer File
     echo =============== 1. Input Installer File =============== ;
+    ARR_SUPPORTED_FILETYPE=(pkg dmg)
     #[FUNCTION] - Input path to the existing installer
         Fn_FirstUserInput () {
-            echo _____________________ ;
+            echo ------------------- ;
+            echo ;
             echo [suggestion] You may drag and drop the file into this terminal to add the address ;
+            echo [info] The current version only handles $(IFS=/; echo "${ARR_SUPPORTED_FILETYPE[*]}") file extensions. ;
             echo  ;
             read -p "Insert address to the installer file: " FULLPATH_ORIGINAL ;
-            echo _____________________ ;
+            echo ------------------- ;
         }
     #[PROCEDURE] - Run the function and validation rules
+        #Check if the exists and is an executable
         Fn_FirstUserInput ;
-        while [ ! -x $FULLPATH_ORIGINAL ] || [[ "$FULLPATH_ORIGINAL" == "" ]]; do
-            echo !!!!;
-            echo [ERROR] The path you specified does not point to an executable file. ;
-            echo Please insert a valid address. ;
-            echo !!!!;
-            Fn_FirstUserInput ;
-        done
+        while [[ "$FILETYPE_VALID" != "True" ]] ; do
+
+            while [ ! -x "$FULLPATH_ORIGINAL" ] ; do
+                echo ;
+                echo [ERROR] The path you specified does not point to an executable file. ;
+                echo Please insert a valid address. ;
+                echo ;
+                Fn_FirstUserInput ;
+            done
 
     #[PROCEDURE] - Set Filename and the Filetype variables
             FILENAME_ORIGINAL="${FULLPATH_ORIGINAL##*/}" ;
             FILETYPE="${FULLPATH_ORIGINAL##*.}" ;
-    #[STATUS] - Provide user with status of current configs
+            #Convert filetype to lowercase so it can be compared to supported filetype array
+            FILETYPE=$(echo "$FILETYPE" | tr '[:upper:]' '[:lower:]')
+    #[PROCEDURE] - Set input validation for supported filetypes only
+            IFS=@
+            case "@${ARR_SUPPORTED_FILETYPE[*]}@" in
+            *"@$FILETYPE@"*)
+                FILETYPE_VALID="True" 
+                break ;;
+            *)
+                FILETYPE_VALID="False" 
+                echo ;
+                echo [ERROR] "$FILETYPE" file type not supported ;
+                echo ;
+                Fn_FirstUserInput ;;
+            esac
+        done
+    #[STATUS] - Provide user status of current configs
         echo ;
-        echo Full path set to $FULLPATH_ORIGINAL ;
-        echo Filename set to $FILENAME_ORIGINAL ;
-        echo Filetype set to $FILETYPE ;
-
+        echo Full path set to: $FULLPATH_ORIGINAL ;
+        echo Filename set to: $FILENAME_ORIGINAL ;
+        echo Filetype set to: $FILETYPE ;
     echo ;
 #2. [Optional] Input Installer Directory
     echo =============== 2. [Optional] Input Installer Directory =============== ;
@@ -67,7 +88,7 @@
             echo Try again.
             echo  ;
             SecondUserInput ;
-            echo _____________________ ;
+            echo ------------------- ;
         done ;
 
     #[STATUS] - Provide user with status of current configs
@@ -82,7 +103,7 @@
             echo [info] If the path is valid but doesn\'t exist, you will be prompted to create it.
             echo ;
             read -p "Insert the path to the directory where the installer will be copied: " DIRPATH_CLONE ;
-            echo _____________________ ;
+            echo ------------------- ;
             #If the path contains ~, this if statement will resolve it to an absolute path
                 if [[ "$DIRPATH_CLONE" == "~/"* ]] ; then
                     DIRPATH_CLONE="${DIRPATH_CLONE:1}"
@@ -122,7 +143,7 @@
                 elif [[ "$VAR_CREATE" == "n" ]] ; then
                     echo ;
                     echo Directory not created. ;
-                    echo _____________________ ;
+                    echo ------------------- ;
                     Fn_InputTargetDirectory ;
                     continue
                 fi
