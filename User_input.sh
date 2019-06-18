@@ -26,7 +26,7 @@
                     while [ ! -x "$FULLPATH_ORIGINAL" ] ; do
                         local var_s1="[ERROR] The path you specified does not point to an executable file."
                         local var_s2="Please insert a valid address. ;"
-                        Pretty_2statements "$var_s1" "$var_s2"
+                        Pretty_2results "$var_s1" "$var_s2"
                         Fn_FirstUserInput ;
                     done
 
@@ -96,10 +96,14 @@
             Pretty_break
             read -p "Insert the path to the directory where the installer will be copied: " DIRPATH_CLONE ;
             Pretty_break
-            #If the path contains ~, this if statement will resolve it to an absolute path
+            #If the path contains ~, this if statement will resolve it to an absolute path for validation
                 if [[ "$DIRPATH_CLONE" == "~/"* ]] ; then
+                    REL_DIRPATH="$DIRPATH_CLONE"
                     DIRPATH_CLONE="${DIRPATH_CLONE:1}"
                     DIRPATH_CLONE="/Users/$(id -nu)""$DIRPATH_CLONE"
+                    IS_REL_PATH="True"
+                else
+                    IS_REL_PATH="False"
                 fi
         }
 
@@ -149,8 +153,13 @@
 
         done
 
+        #Convert back to relative directory
+        if [[ "$IS_REL_PATH"=="True" ]]; then
+            DIRPATH_CLONE="$REL_DIRPATH" ;
+        fi
+
     #[STATUS] - Provide user with status of current configs
-        echo Current target directory is $DIRPATH_CLONE
+        Pretty_1result "Current target directory is $DIRPATH_CLONE"
 #5. Cleanup Installer After Install
     Pretty_header "Cleanup Installer After Install"
     #[FUNCTION] - Option to delete installers once complete
@@ -169,9 +178,9 @@
         done
     #[STATUS] - Provide user with status of current configs
         if [[ "$VAR_CLEANUP" == "y" ]] ; then
-            echo Cleanup enabled ;
+            Pretty_1result "Cleanup enabled" ;
         elif [[ "$VAR_CLEANUP" == "n" ]] ; then
-            echo Cleanup disabled ;
+            Pretty_1result "Cleanup disabled" ;
         fi        
 #6. Enable Install Script
     Pretty_header "Enable Install Script"

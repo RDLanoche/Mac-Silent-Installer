@@ -65,6 +65,7 @@ Pretty_3results() {
 Pretty_header() {
     echo ;
     echo =============== $1 =============== ;
+    echo ;
 }
 
 Pretty_break() {
