@@ -21,37 +21,38 @@
             echo ------------------- ;
         }
     #[PROCEDURE] - Run the function and validation rules
-        #Check if the exists and is an executable
-        Fn_FirstUserInput ;
-        while [[ "$FILETYPE_VALID" != "True" ]] ; do
+        #Run Fn_FirstUserInput
+            Fn_FirstUserInput ;
+        #Validation loop, breaks if file is exist and of valid file type.
+            while [[ "$FILETYPE_VALID" != "True" ]] ; do
+                #Check if the file exists and is an executable
+                    while [ ! -x "$FULLPATH_ORIGINAL" ] ; do
+                        echo ;
+                        echo [ERROR] The path you specified does not point to an executable file. ;
+                        echo Please insert a valid address. ;
+                        echo ;
+                        Fn_FirstUserInput ;
+                    done
 
-            while [ ! -x "$FULLPATH_ORIGINAL" ] ; do
-                echo ;
-                echo [ERROR] The path you specified does not point to an executable file. ;
-                echo Please insert a valid address. ;
-                echo ;
-                Fn_FirstUserInput ;
+            #[PROCEDURE] - Set Filename and the Filetype variables
+                FILENAME_ORIGINAL="${FULLPATH_ORIGINAL##*/}" ;
+                FILETYPE="${FULLPATH_ORIGINAL##*.}" ;
+                #Convert filetype to lowercase so it can be compared to supported filetype array
+                FILETYPE=$(echo "$FILETYPE" | tr '[:upper:]' '[:lower:]')
+            #[PROCEDURE] - Evaluate validation for supported filetypes only
+                IFS=@
+                case "@${ARR_SUPPORTED_FILETYPE[*]}@" in
+                    *"@$FILETYPE@"*)
+                        FILETYPE_VALID="True" 
+                        break ;;
+                    *)
+                        FILETYPE_VALID="False" 
+                        echo ;
+                        echo [ERROR] "$FILETYPE" file type not supported ;
+                        echo ;
+                        Fn_FirstUserInput ;;
+                esac
             done
-
-    #[PROCEDURE] - Set Filename and the Filetype variables
-            FILENAME_ORIGINAL="${FULLPATH_ORIGINAL##*/}" ;
-            FILETYPE="${FULLPATH_ORIGINAL##*.}" ;
-            #Convert filetype to lowercase so it can be compared to supported filetype array
-            FILETYPE=$(echo "$FILETYPE" | tr '[:upper:]' '[:lower:]')
-    #[PROCEDURE] - Set input validation for supported filetypes only
-            IFS=@
-            case "@${ARR_SUPPORTED_FILETYPE[*]}@" in
-            *"@$FILETYPE@"*)
-                FILETYPE_VALID="True" 
-                break ;;
-            *)
-                FILETYPE_VALID="False" 
-                echo ;
-                echo [ERROR] "$FILETYPE" file type not supported ;
-                echo ;
-                Fn_FirstUserInput ;;
-            esac
-        done
     #[STATUS] - Provide user status of current configs
         echo ;
         echo Full path set to: $FULLPATH_ORIGINAL ;
