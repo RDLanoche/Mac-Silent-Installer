@@ -173,7 +173,7 @@ cd "$(dirname "$0")"
         done
 
         #Convert back to relative directory
-        if [[ "$IS_REL_PATH"=="True" ]]; then
+        if [ "$IS_REL_PATH"=="True" ]; then
             DIRPATH_CLONE="$REL_DIRPATH" ;
         fi
 
@@ -238,7 +238,7 @@ cd "$(dirname "$0")"
     echo Directory to copy: $DIRPATH_ORIGINAL ;
     echo Target directory: $DIRPATH_CLONE ;
     echo Cleanup after install? $VAR_CLEANUP ;
-    echo Install script enabled? $VAR_ENABL
+    echo Install script enabled? $VAR_ENABLE ;
 #Extra Comments
     #Strip slashes from the end of the second and third input
     #Input validation for the last two inputs.
