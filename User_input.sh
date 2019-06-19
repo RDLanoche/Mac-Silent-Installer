@@ -1,18 +1,21 @@
 #!/bin/sh
+cd "$(dirname "$0")"
 
 #0.1 Import Source Shells
     source Pretty_Bash.sh
 #0.2 Declare Global Variables
     ARR_SUPPORTED_FILETYPE=(pkg dmg)
+#0.3 Global Functions
 #1. Title
     Pretty_title "MAC INSTALLER - COPY, PASTE, THEN INSTALL"
 #2. Input Installer File
     Pretty_header "Input Installer File"
     #[FUNCTION] - Input path to the existing installer
         Fn_FirstUserInput () {
-            local var_s1="$PrettySuggestion You may drag and drop the file into this terminal to add the address"
-            local var_s2="$PrettyInfo The current version only handles $(IFS=/; echo "${ARR_SUPPORTED_FILETYPE[*]}") file extensions."
+            var_s1="$PrettySuggestion You may drag and drop the file into this terminal to add the address"
+            var_s2="$PrettyInfo The current version only handles $(IFS=/; echo "${ARR_SUPPORTED_FILETYPE[*]}") file extensions."
             Pretty_2statements  "$var_s1" "$var_s2" ;
+            echo ;
             Pretty_break
             read -p "Insert address to the installer file: " FULLPATH_ORIGINAL ;
             Pretty_break
@@ -24,8 +27,8 @@
             while [[ "$FILETYPE_VALID" != "True" ]] ; do
                 #Check if the file exists and is an executable
                     while [ ! -x "$FULLPATH_ORIGINAL" ] ; do
-                        local var_s1="[ERROR] The path you specified does not point to an executable file."
-                        local var_s2="Please insert a valid address. ;"
+                        var_s1="[ERROR] The path you specified does not point to an executable file."
+                        var_s2="Please insert a valid address. ;"
                         Pretty_2results "$var_s1" "$var_s2"
                         Fn_FirstUserInput ;
                     done
@@ -66,6 +69,15 @@
         SecondUserInput () {
             echo ;
             read -p "[optional] To change the directory you wish to copy, insert new value here: " DIRPATH_ORIGINAL ;
+            if [[ "$DIRPATH_ORIGINAL" == "~/"* ]] ; then
+                DIRPATH_ORIGINAL="${DIRPATH_ORIGINAL:1}" ;
+                DIRPATH_ORIGINAL="/Users/$(id -nu)""$DIRPATH_ORIGINAL" ;
+            fi
+
+            #Trim Response so that spaced don't compromise comparisons
+            DIRPATH_ORIGINAL="$(echo "${DIRPATH_ORIGINAL}" | sed -e 's/[[:space:]]*$//')" ;
+
+            #If left blank set to default.
             if [[ "$DIRPATH_ORIGINAL" == "" ]] ; then
                 Fn_SetOriginalDirpath ;
             fi
@@ -77,8 +89,8 @@
         #checks is the directory is a valid directory (prevents user from inputting incomplete portion of the directory)
         SecondUserInput ;
         while [[ "$FULLPATH_ORIGINAL" != "$DIRPATH_ORIGINAL"* ]] || [ ! -d "$DIRPATH_ORIGINAL" ] ; do
-            local var_s1="[ERROR] The path you specified needs to be a parent to the installer file."
-            local var_s2="Try again."
+            var_s1="[ERROR] The path you specified needs to be a parent to the installer file."
+            var_s2="Try again."
             Pretty_2results "$var_s1" "$var_s2" ;
             SecondUserInput ;
             echo ------------------- ;
@@ -90,8 +102,8 @@
     Pretty_header "Target Directory"
     #[FUNCTION] - Input path to the directory where the installer will be copied to
         Fn_InputTargetDirectory() {
-            local var_s1="[suggestion] To avoid errors, create the folder in your system then drag and drop it to this window."
-            local var_s2="[info] If the path is valid but doesn't exist, you will be prompted to create it."
+            var_s1="[suggestion] To avoid errors, create the folder in your system then drag and drop it to this window."
+            var_s2="[info] If the path is valid but doesn't exist, you will be prompted to create it."
             Pretty_2statements "$var_s1" "$var_s2"
             Pretty_break
             read -p "Insert the path to the directory where the installer will be copied: " DIRPATH_CLONE ;
@@ -126,8 +138,8 @@
                 read -p "Would you like to create it, instead? (y/n): " VAR_CREATE ;
 
                 while [[ "$VAR_CREATE" != "y" ]] && [[ "$VAR_CREATE" != "n" ]] ; do
-                    local var_s1="User input invalid." ;
-                    local var_s2="Try again!" ;
+                    var_s1="User input invalid." ;
+                    var_s2="Try again!" ;
                     Pretty_2results "$var_s1" "$var_s2"
                     InputTargetDirectoryErr ;
                 done ;
@@ -142,8 +154,8 @@
                 fi
             #If the path starts with a ./, then the system gives an error and asks the user for a full path.
             elif [[ "$DIRPATH_CLONE" == "./"* ]] ; then
-                local var_s1="current path shortcut './' is not supported in this program."
-                local var_s2="please print the absolute or relative '~/' path instead."
+                var_s1="current path shortcut './' is not supported in this program."
+                var_s2="please print the absolute or relative '~/' path instead."
                 Pretty_2results "$var_s1" "$var_s2" ;
                 Fn_InputTargetDirectory ;
             else    
@@ -171,8 +183,8 @@
         VAR_CLEANUP="y" ;
         Fn_Cleanup ;
         while [[ "$VAR_CLEANUP" != "y" ]] && [[ "$VAR_CLEANUP" != "n" ]] ; do
-            local var_s1="User input invalid."
-            local var_s2="Try again!"
+            var_s1="User input invalid."
+            var_s2="Try again!"
             Pretty_2results "$var_s1" "$var_s2"
             Fn_Cleanup ;
         done
@@ -186,9 +198,9 @@
     Pretty_header "Enable Install Script"
     #[FUNCTION] - Option to enable the script for the ScriptRunner.sh
         Fn_Enable() {
-            local var_s1="[INFO] By enabling the installer script, the script runner will run this Script"
-            local var_s2="along with all the other enabled script. If the script is disabled, it can still"
-            local var_s3="be run manually."
+            var_s1="[INFO] By enabling the installer script, the script runner will run this Script"
+            var_s2="along with all the other enabled scripts. If the script is disabled, it can still"
+            var_s3="be run manually."
             Pretty_3statements "$var_s1" "$var_s2" "$var_s3"
             Pretty_break
             read -p "Do you wish to enable this installer script? (y/n): " VAR_ENABLE ;
@@ -198,8 +210,8 @@
         VAR_ENABLE="y" ;
         Fn_Enable ;
         while [[ "$VAR_ENABLE" != "y" ]] && [[ "$VAR_ENABLE" != "n" ]] ; do
-            local var_s1="User input invalid."
-            local var_s2="Try again!"
+            var_s1="User input invalid."
+            var_s2="Try again!"
             Pretty_2results "$var_s1" "$var_s2"
             Fn_Enable ;
         done
