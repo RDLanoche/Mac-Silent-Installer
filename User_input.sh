@@ -1,4 +1,4 @@
-#!/bin/sh
+!/bin/sh
 cd "$(dirname "$0")"
 
 #0.1 Import Source Shells
@@ -18,11 +18,12 @@ cd "$(dirname "$0")"
             echo ;
             Pretty_break
             read -p "Insert address to the installer file: " FULLPATH_ORIGINAL ;
+             #Trim Response so that spaces don't compromise comparisons
+            FULLPATH_ORIGINAL="$(echo "${FULLPATH_ORIGINAL}" | sed -e 's/[[:space:]]*$//')" ;
             Pretty_break
         }
     #[PROCEDURE] - Run the function and validation rules
-        #Run Fn_FirstUserInput
-            Fn_FirstUserInput ;
+        Fn_FirstUserInput ;
         #Validation loop, breaks if file is exist and of valid file type.
             while [[ "$FILETYPE_VALID" != "True" ]] ; do
                 #Check if the file exists and is an executable
@@ -65,7 +66,7 @@ cd "$(dirname "$0")"
         Fn_SetOriginalDirpath ;
         echo Currently, the directory to be copied is: $DIRPATH_ORIGINAL ;
 
-    #[FUNCTION] - Declare custpm path if user wishes to change directory to be copied
+    #[FUNCTION] - Declare custom path if user wishes to change directory to be copied
         SecondUserInput () {
             echo ;
             read -p "[optional] To change the directory you wish to copy, insert new value here: " DIRPATH_ORIGINAL ;
@@ -74,7 +75,7 @@ cd "$(dirname "$0")"
                 DIRPATH_ORIGINAL="/Users/$(id -nu)""$DIRPATH_ORIGINAL" ;
             fi
 
-            #Trim Response so that spaced don't compromise comparisons
+            #Trim Response so that spaces don't compromise comparisons
             DIRPATH_ORIGINAL="$(echo "${DIRPATH_ORIGINAL}" | sed -e 's/[[:space:]]*$//')" ;
 
             #If left blank set to default.
@@ -102,30 +103,36 @@ cd "$(dirname "$0")"
     Pretty_header "Target Directory"
     #[FUNCTION] - Input path to the directory where the installer will be copied to
         Fn_InputTargetDirectory() {
+
             var_s1="[suggestion] To avoid errors, create the folder in your system then drag and drop it to this window."
             var_s2="[info] If the path is valid but doesn't exist, you will be prompted to create it."
             Pretty_2statements "$var_s1" "$var_s2"
             Pretty_break
+
             read -p "Insert the path to the directory where the installer will be copied: " DIRPATH_CLONE ;
+
+            #Trim Response so that spaces don't compromise comparisons
+            DIRPATH_CLONE="$(echo "${DIRPATH_CLONE}" | sed -e 's/[[:space:]]*$//')" ;
+
             Pretty_break
+
             #If the path contains ~, this if statement will resolve it to an absolute path for validation
-                if [[ "$DIRPATH_CLONE" == "~/"* ]] ; then
-                    REL_DIRPATH="$DIRPATH_CLONE"
-                    DIRPATH_CLONE="${DIRPATH_CLONE:1}"
-                    DIRPATH_CLONE="/Users/$(id -nu)""$DIRPATH_CLONE"
-                    IS_REL_PATH="True"
-                else
-                    IS_REL_PATH="False"
-                fi
+            if [[ "$DIRPATH_CLONE" == "~/"* ]] ; then
+                REL_DIRPATH="$DIRPATH_CLONE"
+                DIRPATH_CLONE="${DIRPATH_CLONE:1}"
+                DIRPATH_CLONE="/Users/$(id -nu)""$DIRPATH_CLONE"
+                IS_REL_PATH="True"
+            else
+                IS_REL_PATH="False"
+            fi
         }
 
-    #[FUNCTION] - Report error in case the directory input by user doesn't exist
+    #[FUNCTION] - Report error in case the directory entered doesn't exist
         InputTargetDirectoryErr() {
             Pretty_1statement "[ERROR] The path you specified is not a directory."
         }
 
     #[PROCEDURE] - Run function and validation rules
-        
         Fn_InputTargetDirectory
         #If the directory doesn't exist, program checks if it is a valid directory path.
         #if it is, then it asks the user if they wish to create it. If the response is
@@ -172,8 +179,8 @@ cd "$(dirname "$0")"
 
     #[STATUS] - Provide user with status of current configs
         Pretty_1result "Current target directory is $DIRPATH_CLONE"
-#5. Cleanup Installer After Install
-    Pretty_header "Cleanup Installer After Install"
+#5. Cleanup After Install
+    Pretty_header "Cleanup After Install"
     #[FUNCTION] - Option to delete installers once complete
         Fn_Cleanup() {
             Pretty_break ;
@@ -225,6 +232,13 @@ cd "$(dirname "$0")"
     Pretty_header "Summary of current configurations"
 #8. Generate Install Script
     Pretty_header "Generate Install Script"
+#9. Summary
+    Pretty_header "Current Configurations"
+    echo Installer: $FULLPATH_ORIGINAL ;
+    echo Directory to copy: $DIRPATH_ORIGINAL ;
+    echo Target directory: $DIRPATH_CLONE ;
+    echo Cleanup after install? $VAR_CLEANUP ;
+    echo Install script enabled? $VAR_ENABL
 #Extra Comments
     #Strip slashes from the end of the second and third input
     #Input validation for the last two inputs.

@@ -12,8 +12,12 @@ an extracted package file (more details on this later).
 
 Process for the user:
 
-use this command to activate the program:
-- chmod +x /path/to/Activate.sh
+Use this command to activate the program:
+- MyPath= <drag and drop this file in the terminal window then press enter>
+- MyPath="${MyPath%/README.txt}" ; MyPath="$MyPath""/ActivateMe.sh" ; chmod +x $MyPath ; $MyPath 
+
+Afterwards:
+- Open the User_input.sh
 
 - User_input:
     - [optional] User inputs the main folder that holds the installer.
